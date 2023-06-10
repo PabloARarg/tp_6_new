@@ -54,6 +54,7 @@ void SetTicks(clock_t reloj);
 void AumentarTick(clock_t reloj);
 
 /* === Public function declarations ============================================================ */
+void AumentarTick(clock_t reloj);
 
 clock_t ClockCreate(uint32_t ticks_por_segundos);
 
@@ -66,16 +67,26 @@ bool ClockGetTime(clock_t reloj, uint8_t * hora, uint32_t size);
 void ActualizarHora(clock_t reloj);
 
 // • La librería deberá proporcionar una función para fijar la hora de la alarma.
+bool ClockSetAlarm(clock_t reloj, const uint8_t * hora, uint32_t size);
+
 // • La librería deberá proporcionar una función para consultar la hora fijada para la alarma.
+bool ClockGetAlarm(clock_t reloj, uint8_t * hora, uint32_t size);
+
 // • La librería deberá proporcionar una función para habilitar y deshabilitar la alarma.
+bool AlarmaOnOf(clock_t reloj, bool estado_requerido);
+
 // • La librería deberá proporcionar una función para consultar si la alarma está, o no, habilitada.
+bool AlarmaGetState(clock_t reloj);
+
 // • La librería deberá proporcionar una función para posponer la alarma una cantidad arbitraria
 // de minutos.-> primero 5 minutos
+bool AlarmaRest(clock_t reloj, uint8_t tiempo_muerto);
 
 // • La librería deberá generar un evento cuando la alarma esté habilitada y además hora actual
 // coincida con la hora de la alarma.-> cuando cambia el minuto se fija si la alarma sonara -> la alarma tiene presicion
 // de minutos
 
+bool ActivarAlarma(clock_t reloj);
 /* === End of documentation ==================================================================== */
 
 #ifdef __cplusplus
