@@ -54,16 +54,21 @@ void SetTicks(clock_t reloj);
 void AumentarTick(clock_t reloj);
 
 /* === Public function declarations ============================================================ */
+
+//! Auementa el contador interno del reloj en 1
 void AumentarTick(clock_t reloj);
 
+//! Crea el reloj
 clock_t ClockCreate(uint32_t ticks_por_segundos);
 
 // • La librería deberá proporcionar una función para ajustar la hora actual.
 //! Copia el contenido de *hora en reloj->hora_actual y en el campo validad=actual
 bool ClockSetTime(clock_t reloj, const uint8_t * hora, uint32_t size);
 
+//! Obteine la hora
 bool ClockGetTime(clock_t reloj, uint8_t * hora, uint32_t size);
 
+//! Actualiza la hora(refresca la hora en funcion al contador de interno del reloj)
 void ActualizarHora(clock_t reloj);
 
 // • La librería deberá proporcionar una función para fijar la hora de la alarma.
@@ -82,11 +87,15 @@ bool AlarmaGetState(clock_t reloj);
 // de minutos.-> primero 5 minutos
 bool AlarmaRest(clock_t reloj, uint8_t tiempo_muerto);
 
+// Funcion hace sonar la alarma
+bool AlarmaActivar(clock_t reloj);
+
+// Funcion cancela pospone la alarma por un dia
+bool AlarmaPosponer(clock_t reloj);
+
 // • La librería deberá generar un evento cuando la alarma esté habilitada y además hora actual
 // coincida con la hora de la alarma.-> cuando cambia el minuto se fija si la alarma sonara -> la alarma tiene presicion
 // de minutos
-
-bool ActivarAlarma(clock_t reloj);
 /* === End of documentation ==================================================================== */
 
 #ifdef __cplusplus

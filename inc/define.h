@@ -44,6 +44,9 @@ extern "C" {
 //! Define la cantidad de veces por segundo que se llamará a la función para mantener la hora actualizada.
 #define CANT_REFRESCO 60
 
+//! Define la cantidad de minutos que se pospone la alarma
+#define TIME_OUT 5
+
 /* === End of documentation ==================================================================== */
 
 #ifdef __cplusplus

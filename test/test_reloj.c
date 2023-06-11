@@ -174,7 +174,7 @@ void test_alarm_match(void) {
     AumentarTick(reloj); // aumenta 1 tick al contador
 
     ActualizarHora(reloj); // actualiza la hora del reloj
-    TEST_ASSERT_TRUE(ActivarAlarma(reloj));
+    TEST_ASSERT_TRUE(AlarmaActivar(reloj));
 }
 // ‣ Fijar la alarma, deshabilitarla y avanzar el reloj para no suene.
 void test_alarm_match_no_sound(void) {
@@ -207,15 +207,53 @@ void test_alarm_standby(void) {
     AumentarTick(reloj); // aumenta 1 tick al contador
 
     ActualizarHora(reloj); // actualiza la hora del reloj
-    TEST_ASSERT_TRUE(ActivarAlarma(reloj));
+    TEST_ASSERT_TRUE(AlarmaActivar(reloj));
     TEST_ASSERT_TRUE(AlarmaRest(reloj, TIME_OUT));
-    TEST_ASSERT_FALSE(ActivarAlarma(reloj));
+    TEST_ASSERT_FALSE(AlarmaActivar(reloj));
 }
 
 // ‣ Hacer sonar la alarma y cancelarla hasta el otro dia..
+void test_alarm_pospone(void) {
 
+    static const uint8_t ESPERADO[] = {1, 0, 1, 0, 0, 0};
+    uint8_t hora[6] = {1, 0, 0, 9, 5, 9}; // a 1 seg de cambiar la hora
+    clock_t reloj = ClockCreate(TICK_POR_SEC);
+
+    ClockSetTime(reloj, hora, 6);      // estabelce la hora
+    ClockSetAlarm(reloj, ESPERADO, 6); // establece la alarma
+
+    SetTicks(reloj);     // coloca al contador de ticks del reloj 1 por debajo del necesario
+    AumentarTick(reloj); // aumenta 1 tick al contador
+
+    ActualizarHora(reloj);                    // actualiza la hora del reloj
+    TEST_ASSERT_TRUE(AlarmaActivar(reloj));   // comprueba que la alarma suena
+    TEST_ASSERT_FALSE(AlarmaPosponer(reloj)); // pospone la alarma
+
+    SetTicks(reloj);     // coloca al contador de ticks del reloj 1 por debajo del necesario
+    AumentarTick(reloj); // aumenta 1 tick al contador
+
+    ActualizarHora(reloj);                   // actualiza la hora y avanza 1 segundo
+    TEST_ASSERT_FALSE(AlarmaActivar(reloj)); // comprueba si la alarma sigue sonando
+
+    // establece nuevamente la hora a 1 seg de que suene la alarma
+    ClockSetTime(reloj, hora, 6); // estabelce la hora
+
+    SetTicks(reloj);     // coloca al contador de ticks del reloj 1 por debajo del necesario
+    AumentarTick(reloj); // aumenta 1 tick al contador
+
+    ActualizarHora(reloj); // actualiza la hora del reloj
+
+    ClockGetTime(reloj, hora, 6);                     // toma el valor del reloj actual a hora
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(ESPERADO, hora, 6); // compara la hora de la alarma con la hora del reloj
+    TEST_ASSERT_TRUE(AlarmaActivar(reloj));           // comprueba que la alarma suena
+}
 // Probar horas invalidas y verifica que las rechaza...
+void test_hora_invalida(void) {
 
-// Desactivar alarma despues de 5 min
+    uint8_t hora[6] = {4, 0, 0, 9, 5, 9}; // a 1 seg de cambiar la hora
+    clock_t reloj = ClockCreate(TICK_POR_SEC);
+
+    TEST_ASSERT_FALSE(ClockSetTime(reloj, hora, 6));
+}
 
 /* === Public function implementation ========================================================= */

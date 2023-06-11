@@ -73,6 +73,7 @@ void ComprobarUnidadMinutos(uint8_t * hora, clock_t reloj);
 void ComprobarDecenaMinutos(uint8_t * hora, clock_t reloj);
 void ComprobarUnidadHora(uint8_t * hora, clock_t reloj);
 void ComporbarDescanso(clock_t reloj);
+bool HoraValida(const uint8_t * hora);
 
 /* === Public variable definitions ============================================================= */
 
@@ -142,7 +143,26 @@ void ComporbarDescanso(clock_t reloj) {
     return;
 }
 
+//! Determina si la hora a almacenar es valida
+bool HoraValida(const uint8_t * hora) {
+    bool aux = false;
+
+    if (hora[5] <= 9 && hora[4] <= 5 && hora[3] <= 9 && hora[2] <= 5) {
+        if (hora[1] <= 9 && hora[0] < 2) {
+            aux = true;
+        } else if (hora[1] <= 3 && hora[0] == 2) {
+            aux = true;
+        } else {
+            aux = false;
+        }
+    }
+
+    return aux;
+}
+
 /* === Public function implementation ========================================================= */
+
+//! Aumenta el contador en 1
 void AumentarTick(clock_t reloj) {
     reloj->ticks_actual++;
     return;
@@ -164,9 +184,15 @@ bool ClockGetTime(clock_t reloj, uint8_t * hora, uint32_t size) {
 
 //! Copia el contenido de *hora en reloj->hora_actual y en el campo validad=actual
 bool ClockSetTime(clock_t reloj, const uint8_t * hora, uint32_t size) {
-    memcpy(reloj->hora_actual, hora, size);
-    reloj->valida = true;
-    return reloj->valida;
+    bool aux = true;
+
+    if (HoraValida(hora)) {
+        memcpy(reloj->hora_actual, hora, size);
+        reloj->valida = true;
+    } else {
+        aux = false;
+    }
+    return reloj->valida && aux;
 }
 
 //! actualiza la hora si la cantidad de tick se alcanzaron
@@ -184,7 +210,7 @@ void ActualizarHora(clock_t reloj) {
         (void)ClockSetTime(reloj, hora, 6);
         reloj->ticks_actual = 0;
         if (reloj->alarma_on) { // si la alarma esta activa consulata
-            (void)ActivarAlarma(reloj);
+            (void)AlarmaActivar(reloj);
         }
     }
     return;
@@ -204,14 +230,15 @@ bool ClockSetAlarm(clock_t reloj, const uint8_t * hora, uint32_t size) {
 }
 
 //! Funcion para hacer sonar la alarma
-bool ActivarAlarma(clock_t reloj) {
+bool AlarmaActivar(clock_t reloj) {
     uint8_t hora[6];
     uint8_t alarma[6];
 
     memcpy(hora, reloj->hora_actual, 6);
     memcpy(alarma, reloj->alarma, 6);
 
-    if (hora[0] == alarma[0] && hora[1] == alarma[1] && hora[2] == alarma[2] && hora[3] == alarma[3]) {
+    if (hora[0] == alarma[0] && hora[1] == alarma[1] && hora[2] == alarma[2] && hora[3] == alarma[3] &&
+        hora[4] == alarma[4] && hora[5] == alarma[5]) {
         reloj->alarma_activada = true;
     }
 
@@ -234,6 +261,12 @@ bool AlarmaGetState(clock_t reloj) {
 bool AlarmaRest(clock_t reloj, uint8_t tiempo_muerto) {
     reloj->tiempo_pospuesto = tiempo_muerto;
     return reloj->tiempo_pospuesto;
+}
+
+//! Funcion para posponer la alarma por un dia
+bool AlarmaPosponer(clock_t reloj) {
+    reloj->alarma_activada = false;
+    return reloj->alarma_activada;
 }
 /* === End of documentation ==================================================================== */
 
